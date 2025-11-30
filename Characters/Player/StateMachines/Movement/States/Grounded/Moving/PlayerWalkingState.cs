@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerWalkingState : PlayerGroundedState
+public class PlayerWalkingState : PlayerMovingState
 {
     public PlayerWalkingState(PlayerMovementStateMachine playerMovementStateMachine) : base(playerMovementStateMachine)
     {
@@ -15,7 +15,7 @@ public class PlayerWalkingState : PlayerGroundedState
     {
         base.Enter();
 
-        speedModifier = 0.225f;
+        stateMachine.ReusableData.MovementSpeedModifier = movementData.WalkData.SpeedModifier;
     }
 
     #endregion

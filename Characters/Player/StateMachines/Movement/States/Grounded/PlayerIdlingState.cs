@@ -15,7 +15,7 @@ public class PlayerIdlingState : PlayerGroundedState
     {
         base.Enter();
 
-        speedModifier = 0f;
+        stateMachine.ReusableData.MovementSpeedModifier = 0f;
 
         ResetVelocity();
     }
@@ -24,7 +24,7 @@ public class PlayerIdlingState : PlayerGroundedState
     {
         base.Update();
 
-        if (movementInput == Vector2.zero)
+        if (stateMachine.ReusableData.MovementInput == Vector2.zero)
         {
             return;
         }
