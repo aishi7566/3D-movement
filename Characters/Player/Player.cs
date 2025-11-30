@@ -4,7 +4,9 @@ using UnityEngine;
 [RequireComponent(typeof(PlayerInput))]
 public class Player : MonoBehaviour
 {
-    public Rigidbody   Rigidbody{ get; private set; }
+    [field: Header("References")]
+    [field:SerializeField] public PlayerSO Data{get; private set;}
+    public Rigidbody Rigidbody{ get; private set; }
     public Transform MainCameraTransform{get;private set;}
     public PlayerInput Input{ get; private set;}
     private PlayerMovementStateMachine movementStateMachine;
