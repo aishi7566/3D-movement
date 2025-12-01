@@ -48,6 +48,20 @@ public class PlayerMovementState : Istate
     {
         Move();
     }
+    public virtual void OnAnimationEnterEvent()
+    {
+        throw new NotImplementedException();
+    }
+
+    public virtual void OnAnimationExitEvent()
+    {
+        throw new NotImplementedException();
+    }
+
+    public virtual void OnAnimationTransitionEvent()
+    {
+        throw new NotImplementedException();
+    }
 #endregion
 
 
@@ -58,7 +72,7 @@ public class PlayerMovementState : Istate
     }
      private void Move()
     {
-        if (stateMachine.ReusableData.MovementInput == Vector2.zero||stateMachine.ReusableData.MovementSpeedModifier ==0f)
+        if (stateMachine.ReusableData.MovementInput == Vector2.zero||stateMachine.ReusableData.MovementOnSolpesSpeedModifier ==0f)
         {
             return;
         }
@@ -125,15 +139,20 @@ public class PlayerMovementState : Istate
 
     protected float GetMovementSpeed()
     {
-        return movementData.BaseSpeed *stateMachine.ReusableData.MovementSpeedModifier;
+        return movementData.BaseSpeed *stateMachine.ReusableData.MovementOnSolpesSpeedModifier * stateMachine.ReusableData.MovementOnSolpesSpeedModifier;
     }  
-     protected Vector3 GetPlayerHorizontalVelocity()
+    protected Vector3 GetPlayerHorizontalVelocity()
     {
         Vector3 playerHorizontalVelocity = stateMachine.Player.Rigidbody.velocity;
 
         playerHorizontalVelocity.y = 0f;
 
         return playerHorizontalVelocity;
+    }
+
+    protected Vector3 GetPlayerVerticalVelocity()
+    {
+        return new Vector3(0f, stateMachine.Player.Rigidbody.velocity.y, 0f);
     }
 
     private void RotateTowardsTargetRotation()
@@ -191,6 +210,23 @@ public class PlayerMovementState : Istate
     {
         stateMachine.Player.Input.PlayerActions.WalkToggle.started -= OnWalkToggleStarted;
     }
+
+    protected void DecelerateHorizontally()
+    {
+        Vector3 playerHorizontalVelocity = GetPlayerHorizontalVelocity();
+
+        stateMachine.Player.Rigidbody.AddForce(-playerHorizontalVelocity*stateMachine.ReusableData.MovementDecelerationForce,ForceMode.Acceleration);
+
+    }
+
+    protected bool IsMovingHorizontally(float minimumMagnitude = 0.1f)
+    {
+        Vector3 playerHorizontalVelocity = GetPlayerHorizontalVelocity();
+
+        Vector2 playerHorizontalMovement = new Vector2(playerHorizontalVelocity.x,playerHorizontalVelocity.z);
+
+        return playerHorizontalMovement.magnitude > minimumMagnitude;
+    }
 #endregion
 
 #region Input Methods
@@ -200,5 +236,7 @@ public class PlayerMovementState : Istate
         stateMachine.ReusableData.ShouldWalk =! stateMachine.ReusableData.ShouldWalk;
     }
 
-#endregion
+    
+
+    #endregion
 }

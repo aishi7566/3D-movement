@@ -15,7 +15,7 @@ public class PlayerIdlingState : PlayerGroundedState
     {
         base.Enter();
 
-        stateMachine.ReusableData.MovementSpeedModifier = 0f;
+        stateMachine.ReusableData.MovementOnSolpesSpeedModifier = 0f;
 
         ResetVelocity();
     }
