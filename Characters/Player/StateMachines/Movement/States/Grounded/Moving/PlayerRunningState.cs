@@ -18,7 +18,9 @@ public class PlayerRunningState : PlayerMovingState
     {
         base.Enter();
 
-        stateMachine.ReusableData.MovementOnSolpesSpeedModifier = movementData.RunData.SpeedModifier;
+        stateMachine.ReusableData.MovementSpeedModifier = movementData.RunData.SpeedModifier;
+
+        stateMachine.ReusableData.CurrentJumpForce = airborneData.JumpData.MediumForce;
 
         startTime = Time.time;
     }

@@ -15,7 +15,9 @@ public class PlayerIdlingState : PlayerGroundedState
     {
         base.Enter();
 
-        stateMachine.ReusableData.MovementOnSolpesSpeedModifier = 0f;
+        stateMachine.ReusableData.MovementSpeedModifier = 0f;
+    
+        stateMachine.ReusableData.CurrentJumpForce = airborneData.JumpData.StationaryForce;
 
         ResetVelocity();
     }

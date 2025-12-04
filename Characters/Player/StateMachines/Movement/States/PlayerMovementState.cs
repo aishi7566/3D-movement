@@ -8,18 +8,28 @@ public class PlayerMovementState : Istate
 { 
     protected PlayerMovementStateMachine stateMachine;
     protected PlayerGroundedData movementData;
+    protected PlayerAirborneData airborneData;
     public PlayerMovementState (PlayerMovementStateMachine playerMovementStateMachine)
     {
         stateMachine = playerMovementStateMachine;
 
         movementData = stateMachine.Player.Data.GroundedData;
+
+        airborneData = stateMachine .Player.Data.AirborneData;
         
         InitializeData();
     }
 
     private void InitializeData()
     {
-        stateMachine.ReusableData.TimeToReachTargetRotation=movementData.BaseRotationData.TargetRotationReachTime;
+        SetBaseRotationData();
+    }
+
+    protected void SetBaseRotationData()
+    {
+        stateMachine.ReusableData.RotationData = movementData.BaseRotationData;
+
+        stateMachine.ReusableData.TimeToReachTargetRotation = movementData.BaseRotationData.TargetRotationReachTime;
     }
     #region Istate Methods
     public virtual void Enter()
@@ -50,29 +60,39 @@ public class PlayerMovementState : Istate
     }
     public virtual void OnAnimationEnterEvent()
     {
-        throw new NotImplementedException();
+        
     }
 
     public virtual void OnAnimationExitEvent()
     {
-        throw new NotImplementedException();
+        
     }
 
     public virtual void OnAnimationTransitionEvent()
     {
-        throw new NotImplementedException();
+        
     }
-#endregion
+    public virtual void OnTriggerEnter(Collider collider)
+    {
+        if (stateMachine.Player.LayerData.IsGroundLayer(collider.gameObject.layer))
+            {
+                OnContactWithGround(collider);
+
+                return;
+            }
+    }
+
+    #endregion
 
 
-#region Main Methods
+    #region Main Methods
     private void ReadMovementInput()
     {
         stateMachine.ReusableData.MovementInput = stateMachine.Player.Input.PlayerActions.Movement.ReadValue<Vector2>();
     }
      private void Move()
     {
-        if (stateMachine.ReusableData.MovementInput == Vector2.zero||stateMachine.ReusableData.MovementOnSolpesSpeedModifier ==0f)
+        if (stateMachine.ReusableData.MovementInput == Vector2.zero||stateMachine.ReusableData.MovementSpeedModifier ==0f)
         {
             return;
         }
@@ -139,7 +159,7 @@ public class PlayerMovementState : Istate
 
     protected float GetMovementSpeed()
     {
-        return movementData.BaseSpeed *stateMachine.ReusableData.MovementOnSolpesSpeedModifier * stateMachine.ReusableData.MovementOnSolpesSpeedModifier;
+        return movementData.BaseSpeed *stateMachine.ReusableData.MovementSpeedModifier;
     }  
     protected Vector3 GetPlayerHorizontalVelocity()
     {
@@ -155,7 +175,7 @@ public class PlayerMovementState : Istate
         return new Vector3(0f, stateMachine.Player.Rigidbody.velocity.y, 0f);
     }
 
-    private void RotateTowardsTargetRotation()
+    protected void RotateTowardsTargetRotation()
     {
         float currentYAngle = stateMachine.Player.Rigidbody.rotation.eulerAngles.y;
 
@@ -173,7 +193,7 @@ public class PlayerMovementState : Istate
         stateMachine.Player.Rigidbody.MoveRotation(targetRotation);
     }
 
-     protected private float UpdateTargetRotation(Vector3 direction,bool shouldConsiderCaneraRotation = true)
+     protected float UpdateTargetRotation(Vector3 direction,bool shouldConsiderCaneraRotation = true)
     {
         float directionAngle = GetDirectionAngle(direction);
 
@@ -218,7 +238,16 @@ public class PlayerMovementState : Istate
         stateMachine.Player.Rigidbody.AddForce(-playerHorizontalVelocity*stateMachine.ReusableData.MovementDecelerationForce,ForceMode.Acceleration);
 
     }
+    protected void DecelerateVertically()
+        {
+            Vector3 playerVerticalVelocity = GetPlayerVerticalVelocity();
 
+            stateMachine.Player.Rigidbody.AddForce(-playerVerticalVelocity * stateMachine.ReusableData.MovementDecelerationForce, ForceMode.Acceleration);
+        }
+    protected virtual void OnContactWithGround(Collider collider)
+    {
+        
+    }
     protected bool IsMovingHorizontally(float minimumMagnitude = 0.1f)
     {
         Vector3 playerHorizontalVelocity = GetPlayerHorizontalVelocity();
@@ -226,6 +255,15 @@ public class PlayerMovementState : Istate
         Vector2 playerHorizontalMovement = new Vector2(playerHorizontalVelocity.x,playerHorizontalVelocity.z);
 
         return playerHorizontalMovement.magnitude > minimumMagnitude;
+    }
+    protected bool IsMovingUp(float minimumVelocity = 0.1f)
+    {
+        return GetPlayerVerticalVelocity().y > minimumVelocity;
+    }
+
+    protected bool IsMovingDown(float minimumVelocity = 0.1f)
+    {
+        return GetPlayerVerticalVelocity().y < -minimumVelocity;
     }
 #endregion
 
@@ -236,7 +274,9 @@ public class PlayerMovementState : Istate
         stateMachine.ReusableData.ShouldWalk =! stateMachine.ReusableData.ShouldWalk;
     }
 
-    
+   
+
+
 
     #endregion
 }

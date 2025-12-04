@@ -15,7 +15,9 @@ public class PlayerWalkingState : PlayerMovingState
     {
         base.Enter();
 
-        stateMachine.ReusableData.MovementOnSolpesSpeedModifier = movementData.WalkData.SpeedModifier;
+        stateMachine.ReusableData.MovementSpeedModifier = movementData.WalkData.SpeedModifier;
+
+        stateMachine.ReusableData.CurrentJumpForce = airborneData.JumpData.WeakForce;
     }
 
     #endregion

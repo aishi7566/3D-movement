@@ -6,6 +6,32 @@ using UnityEngine.InputSystem;
 
 public class PlayerGroundedState : PlayerMovementState
 {
+    public override void Enter()
+        {
+            base.Enter();
+
+            //StartAnimation(stateMachine.Player.AnimationData.GroundedParameterHash);
+
+            UpdateShouldSprintState();
+
+            //UpdateCameraRecenteringState(stateMachine.ReusableData.MovementInput);
+        }
+
+    private void UpdateShouldSprintState()
+    {
+        if (!stateMachine.ReusableData.ShouldSprint)
+            {
+                return;
+            }
+
+            if (stateMachine.ReusableData.MovementInput != Vector2.zero)
+            {
+                return;
+            }
+
+            stateMachine.ReusableData.ShouldSprint = false;
+    }
+
     private SlopeData slopeData;
     public PlayerGroundedState(PlayerMovementStateMachine playerMovementStateMachine) : base(playerMovementStateMachine)
     {
@@ -72,16 +98,27 @@ public class PlayerGroundedState : PlayerMovementState
         stateMachine.Player.Input.PlayerActions.Movement.canceled += OnMovementCanceled;
 
         stateMachine.Player.Input.PlayerActions.Dash.started += OnDashStarted;
+
+        stateMachine.Player.Input.PlayerActions.Jump.started += OnJumpStarted;
     }
+
     private protected override void RemoveInputActionsCallbacks()
     {
         stateMachine.Player.Input.PlayerActions.Movement.canceled -= OnMovementCanceled;
 
         stateMachine.Player.Input.PlayerActions.Dash.started -= OnDashStarted;
+
+        stateMachine.Player.Input.PlayerActions.Jump.started -= OnJumpStarted;
     }
 
     protected virtual void OnMove()
     {
+        if (stateMachine.ReusableData.ShouldSprint)
+            {
+                stateMachine.ChangeState(stateMachine.SprintingState);
+
+                return;
+            }
         if (stateMachine.ReusableData.ShouldWalk)
         {
             stateMachine.ChangeState(stateMachine.WalkingState);
@@ -101,6 +138,11 @@ public class PlayerGroundedState : PlayerMovementState
     protected virtual void OnDashStarted(InputAction.CallbackContext context)
     {
         stateMachine.ChangeState(stateMachine.DashingState);
+    }
+    
+    protected virtual  void OnJumpStarted(InputAction.CallbackContext context)
+    {
+        stateMachine.ChangeState(stateMachine.JumpingState);
     }
 
     #endregion

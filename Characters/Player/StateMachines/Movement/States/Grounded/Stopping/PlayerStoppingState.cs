@@ -13,11 +13,13 @@ public class PlayerStoppingState : PlayerGroundedState
     {
         base.Enter();
 
-        stateMachine.ReusableData.MovementOnSolpesSpeedModifier = 0f;
+        stateMachine.ReusableData.MovementSpeedModifier = 0f;
     }
     public override void PhysicsUpdate()
     {
         base.PhysicsUpdate();
+
+        RotateTowardsTargetRotation();
 
         if(!IsMovingHorizontally())
         {

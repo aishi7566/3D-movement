@@ -17,6 +17,8 @@ public class PlayerMovementStateMachine : StateMachine
     public PlayerMediumStoppingState MediumStoppingState { get; }
     public PlayerHardStoppingState HardStoppingState { get; }
 
+    public PlayerJumpingState JumpingState {get;}
+
 
     public PlayerMovementStateMachine(Player player)
     {
@@ -33,6 +35,8 @@ public class PlayerMovementStateMachine : StateMachine
         LightStoppingState = new PlayerLightStoppingState(this);
         MediumStoppingState = new PlayerMediumStoppingState(this);
         HardStoppingState = new PlayerHardStoppingState(this);
+
+        JumpingState = new PlayerJumpingState(this);
     }
 
     public PlayerMovementStateMachine()
